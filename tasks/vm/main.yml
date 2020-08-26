@@ -8,12 +8,12 @@
 - name: Add user
   user:
     name: "{{ kibana_user }}"
-    comment: Elasticsearch execution user
+    comment: Kibana execution user
     #home: "{{ jenkins_home }}"
     shell: /bin/false
     groups: "{{ kibana_group }}"
 
-- name: Create elasticsearch directories
+- name: Create kibana directories
   file:
     state: directory
     path: "{{ item }}"
@@ -24,6 +24,7 @@
     - "{{ kibana_config_dir }}"
     - "{{ kibana_data_dir }}"
     - "{{ kibana_certificate_dir }}"
+    - "{{ kibana_logging_dest }}"
   register: dir_create
   tags:
     - configuration

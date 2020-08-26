@@ -19,6 +19,14 @@ elasticsearch.ssl.verificationMode: {{ kibana_elasticsearch_ssl_verification_mod
 elasticsearch.ssl.certificateAuthorities {{ kibana_certificate_dir }}/{{ kibana_elasticsearch_certificate_ca_file_ingest }}
 {% endif %}
 
+logging:
+  dest: {{ kibana_logging_dest }}/{{ kibana_logging_file }}
+  verbose: {{ kibana_logging_verbose }}
+  rotate:
+    enabled: {{ kibana_logging_rotate_enabled }}
+    everyBytes: {{ kibana_logging_rotate_bytes }}
+    keepFiles: {{ kibana_logging_rotate_files }}
+
 {% if kibana_monitoring_metricbeat_enabled %}
 xpack.monitoring.kibana.collection.enabled: false
 {% endif %}

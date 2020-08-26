@@ -11,7 +11,14 @@ kibana_server_name: none
 
 kibana_data_dir: /usr/share/kibana/data
 kibana_config_dir: /etc/kibana
-kibana_log_dir: /usr/share/kibana/logs
+
+kibana_logging_dest: /var/log/kibana
+kibana_logging_file: kibana.log
+kibana_logging_verbose: false
+kibana_logging_rotate_enabled: true
+kibana_logging_rotate_bytes: 10485760
+kibana_logging_rotate_files: 5
+
 
 kibana_force_keystore_create: false
 
