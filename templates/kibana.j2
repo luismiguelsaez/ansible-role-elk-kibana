@@ -2,7 +2,12 @@ server:
   host: "0.0.0.0"
   port: "{{ kibana_network_port }}"
   name: {% if kibana_server_name == "none" %}"{{ ansible_hostname }}"{% else %}"{{ kibana_server_name }}"{% endif %}
-
+{% if kibana_security_ssl_enabled|lower == "true" %}
+  ssl:
+    enabled: true
+    certificate: {{ kibana_certificate_dir }}/{{ kibana_security_ssl_certificate }}
+    key: {{ kibana_certificate_dir }}/{{ kibana_security_ssl_key }}
+{% endif %}
 
 {% if kibana_elasticsearch_cluster_network_addresses|length < 1 %}
 elasticsearch.hosts: ["{% if kibana_elasticsearch_security_enabled %}https{% else %}http{% endif %}://{{ ansible_default_ipv4.address }}:{{ kibana_elasticsearch_network_port }}"]
@@ -11,7 +16,7 @@ elasticsearch.hosts: [ {% for node in kibana_elasticsearch_cluster_network_addre
 {% endif %}
 {% if kibana_elasticsearch_security_enabled %}
 elasticsearch.ssl.verificationMode: {{ kibana_elasticsearch_ssl_verification_mode }}
-elasticsearch.ssl.certificateAuthorities: /certs/{{ kibana_elasticsearch_certificate_ca_file_ingest }}
+elasticsearch.ssl.certificateAuthorities {{ kibana_certificate_dir }}/{{ kibana_elasticsearch_certificate_ca_file_ingest }}
 {% endif %}
 
 {% if kibana_monitoring_metricbeat_enabled %}
