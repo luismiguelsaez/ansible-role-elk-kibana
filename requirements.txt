@@ -1,0 +1,3 @@
+molecule>=3.0.0
+molecule-vagrant
+requests

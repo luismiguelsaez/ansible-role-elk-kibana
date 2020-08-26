@@ -1,0 +1,23 @@
+server:
+  host: "0.0.0.0"
+  port: "{{ kibana_network_port }}"
+  name: {% if kibana_server_name == "none" %}"{{ ansible_hostname }}"{% else %}"{{ kibana_server_name }}"{% endif %}
+
+
+{% if kibana_elasticsearch_cluster_network_addresses|length < 1 %}
+elasticsearch.hosts: ["{% if kibana_elasticsearch_security_enabled %}https{% else %}http{% endif %}://{{ ansible_default_ipv4.address }}:{{ kibana_elasticsearch_network_port }}"]
+{% else %}
+elasticsearch.hosts: [ {% for node in kibana_elasticsearch_cluster_network_addresses %}"{% if kibana_elasticsearch_security_enabled %}https{% else %}http{% endif %}://{{ node }}:{{ kibana_elasticsearch_network_port }}"{% if loop.index != kibana_elasticsearch_cluster_network_addresses|length %},{% endif %}{% endfor %} ]
+{% endif %}
+{% if kibana_elasticsearch_security_enabled %}
+elasticsearch.ssl.verificationMode: {{ kibana_elasticsearch_ssl_verification_mode }}
+elasticsearch.ssl.certificateAuthorities: /certs/{{ kibana_elasticsearch_certificate_ca_file_ingest }}
+{% endif %}
+
+{% if kibana_monitoring_metricbeat_enabled %}
+xpack.monitoring.kibana.collection.enabled: false
+{% endif %}
+
+{% if kibana_security_audit_enabled %}
+xpack.security.audit.enabled: true
+{% endif %}

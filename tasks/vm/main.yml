@@ -1,0 +1,107 @@
+---
+
+- name: Add groups
+  group:
+    name: "{{ item }}"
+  with_items: "{{ kibana_group }}"
+
+- name: Add user
+  user:
+    name: "{{ kibana_user }}"
+    comment: Elasticsearch execution user
+    #home: "{{ jenkins_home }}"
+    shell: /bin/false
+    groups: "{{ kibana_group }}"
+
+- name: Create elasticsearch directories
+  file:
+    state: directory
+    path: "{{ item }}"
+    recurse: False
+    owner: "{{ kibana_user }}"
+    group: "{{ kibana_group }}"
+  with_items:
+    - "{{ kibana_config_dir }}"
+    - "{{ kibana_data_dir }}"
+    - "{{ kibana_certificate_dir }}"
+  register: dir_create
+  tags:
+    - configuration
+    - files
+
+- name: Copy SSL certificates
+  copy:
+    src: "{{ kibana_certificate_local_dir }}/"
+    dest: "{{ kibana_certificate_dir }}/"
+  register: copy_certs
+  when: kibana_security_enabled | bool
+  tags:
+    - configuration
+    - files
+    - certificates
+
+- name: Copy kibana configuration
+  template:
+    src: kibana.j2
+    dest: "{{ kibana_config_dir }}/kibana.yml"
+    owner: "{{ kibana_user }}"
+    group: "{{ kibana_group }}"
+  register: kibana_config
+  tags:
+    - configuration
+    - files
+
+- name: Add repository
+  yum_repository:
+    name: kibana
+    description: Kibana official repository
+    baseurl: "{{ kibana_vm_repo_baseurl }}"
+    gpgkey: "{{ kibana_vm_repo_gpgkey }}"
+    gpgcheck: True
+
+- name: Install packages
+  yum:
+    name: "{{ kibana_vm_repo_packages }}"
+    state: latest
+    update_cache: True
+
+- name: Remove kibana keystore
+  file:
+    path: "{{ kibana_config_dir }}/kibana.keystore"
+    state: absent
+  when: kibana_force_keystore_create | bool
+  tags:
+    - configuration
+    - files
+    - keystore
+
+- name: Add kibana keystore keys
+  command: "/usr/share/kibana/bin/kibana-keystore add --force --stdin item.value"
+  args:
+    stdin: "{{ item.key }}"
+  #become_user: "{{ kibana_user }}"
+  when: kibana_security_enabled | bool
+  with_dict:
+    elasticsearch.username: "{{ kibana_security_elasticsearch_user }}"
+    elasticsearch.password: "{{ kibana_security_elasticsearch_pass }}"
+  register: keystore_write
+  tags:
+    - configuration
+    - files
+    - keystore
+
+- name: Start and enable service
+  service:
+    name: kibana
+    state: "{% if kibana_config.changed or keystore_write.changed %}restarted{% else %}started{% endif %}"
+    enabled: True
+
+- name: Wait for kibana port to be opened
+  wait_for:
+    state: started
+    host: "{{ kibana_network_address | default(ansible_default_ipv4.address) }}"
+    port: "{{ kibana_network_port }}"
+    delay: 1
+    timeout: 120
+  tags:
+    - deploy

@@ -1,0 +1,31 @@
+---
+
+kibana_user: kibana
+kibana_group: kibana
+
+kibana_vm_repo_baseurl: https://artifacts.elastic.co/packages/7.x/yum
+kibana_vm_repo_gpgkey: https://artifacts.elastic.co/GPG-KEY-kibana
+kibana_vm_repo_packages: ["kibana"," initscripts"]
+
+kibana_server_name: none
+
+kibana_data_dir: /usr/share/kibana/data
+kibana_config_dir: /etc/kibana
+kibana_log_dir: /usr/share/kibana/logs
+
+kibana_force_keystore_create: false
+
+kibana_security_enabled: false
+kibana_security_audit_enabled: false
+kibana_security_elasticsearch_user: kibana
+kibana_security_elasticsearch_pass: 3l4st1sT4ckb00tstr4p
+
+kibana_network_port: 5601
+
+kibana_elasticsearch_security_enabled: false
+kibana_elasticsearch_cluster_network_addresses: []
+kibana_elasticsearch_network_port: 9200
+kibana_elasticsearch_ssl_verification_mode: none
+kibana_elasticsearch_certificate_ca_file_ingest: ESca.crt
+
+kibana_monitoring_metricbeat_enabled: false
