@@ -62,7 +62,7 @@
 
 - name: Install packages
   yum:
-    name: "{{ kibana_vm_repo_packages }}"
+    name: "{{ kibana_vm_repo_packages | map('regex_replace','^kibana$','kibana-' + kibana_version + '-1' ) | list }}"
     state: latest
     update_cache: True
 
