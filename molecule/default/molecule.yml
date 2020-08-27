@@ -12,6 +12,7 @@ platforms:
   - name: instance-${MOLECULE_ROLE_NAME:-molecule}-1
     groups:
       - kibana
+      - elasticsearch
     box: centos/7
     memory: 512
     cpus: 1
@@ -24,6 +25,8 @@ provisioner:
   group_vars:
     kibana:
       kibana_security_enabled: False
+    elasticsearch:
+      elasticsearch_security_enabled: False
 
 verifier:
   name: ansible

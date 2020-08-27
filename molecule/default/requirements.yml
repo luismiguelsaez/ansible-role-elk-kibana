@@ -1,0 +1,5 @@
+---
+
+- src: https://github.com/luismiguelsaez/ansible-role-elk-elasticsearch.git
+  scm: git
+  version: master
