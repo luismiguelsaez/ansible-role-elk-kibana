@@ -2,6 +2,9 @@
 - name: Converge
   hosts: all
   tasks:
+    - name: "Include ansible-role-elk-elasticsearch"
+      include_role:
+        name: "ansible-role-elk-elasticsearch"
     - name: "Include ansible-role-elk-kibana"
       include_role:
         name: "ansible-role-elk-kibana"
